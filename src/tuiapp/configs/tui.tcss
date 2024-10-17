@@ -1,3 +1,23 @@
-Container {
+Horizontal {
   background: black;
+}
+
+RichLog {
+  background: black;
+  border: round $panel;
+}
+
+Sidebar.-hidden {
+  display: none;
+}
+
+Sidebar {
+  border: round $panel;
+  width: auto;
+  height: auto;
+}
+
+Sidebar > Button {
+  margin: 1 1 1 1;
+  width: 100%;
 }
