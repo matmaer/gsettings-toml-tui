@@ -15,6 +15,10 @@ class Sidebar(Vertical):
 
 
 class Atui(App):
+    BINDINGS = [
+        ("s", "toggle_sidebar", "Toggle Sidebar"),
+        ("q", "quit", "Quit"),
+    ]
     CSS_PATH = TUI_TCSS
 
     def compose(self) -> ComposeResult:
