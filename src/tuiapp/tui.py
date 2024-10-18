@@ -37,11 +37,12 @@ class Atui(App):
                     shell=True,
                     timeout=2,
                 )
-                pretty_exit = f"([green]exit code {result.returncode}[/])"
+                pretty_exit = f"(exit code {result.returncode})"
                 if result.returncode == 0 and result.stdout == "":
+                    # No output and no error, so green success for feedback
                     self.rlog(f"{pretty_cmd} [green](success)[/]")
                 elif result.stdout != "":
-                    self.rlog(f"{pretty_cmd} {pretty_exit}")
+                    self.rlog(f"{pretty_cmd} [green]{pretty_exit}[/]")
                     self.rlog(result.stdout)
                 else:
                     to_print = f"{pretty_cmd} [red]{pretty_exit}[/]"
