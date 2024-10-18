@@ -38,7 +38,7 @@ class Atui(App):
         self.query_one(Sidebar).toggle_class("-hidden")
 
     @on(Button.Pressed, "#show_toml")
-    def show_current_settings(self):
+    def show_toml_settings(self):
         self.query_one(RichLog).write(get_toml())
 
     @on(Button.Pressed, "#clear_richlog")
