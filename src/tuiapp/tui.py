@@ -20,6 +20,10 @@ class Atui(App):
     ]
     CSS_PATH = TUI_TCSS
 
+    def rlog(self, to_print) -> None:
+        rlog = self.query_one(RichLog)
+        rlog.write(to_print)
+
     def compose(self) -> ComposeResult:
         with Horizontal():
             yield Sidebar(id="sidebar")
