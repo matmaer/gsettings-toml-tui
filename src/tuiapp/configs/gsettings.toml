@@ -1,16 +1,6 @@
 ["org.gnome.Console"]
-audible-bell = 'false' 
-custom-font = 'Source Code Pro 13' 
-scrollback-lines = 100000 # added a zero
-theme = 'night' 
-use-system-font = 'false' 
-
-["org.gnome.TextEditor"]
-custom-font = 'Source Code Pro Medium 14'
-restore-session = 'false'
-tab-width = 4
-use-system-font = 'false'
-wrap-text = 'true'
+audible-bell = 'false'
+theme = 'night'
 
 ["org.gnome.World.Secrets"]
 generator-use-lowercase = 'true'
@@ -26,22 +16,3 @@ button-mode = 'advanced'
 clock-format = '24h'
 clock-show-seconds = 'true'
 clock-show-weekday = 'true'
-gtk-timeout-repeat = 30
-
-["org.gnome.desktop.media-handling"]
-automount = 'false'
-automount-open = 'false'
-autorun-never = 'true'
-
-["org.gnome.desktop.privacy"]
-report-technical-problems = 'true'
-send-software-usage-stats = 'true'
-
-["org.gnome.desktop.wm.preferences"]
-audible-bell = 'false'
-button-layout = 'appmenu:minimize,close'
-num-workspaces = 3
-
-["org.gnome.nautilus.list-view"]
-default-visible-columns = ['name', 'size', 'date_created', 'date_modified']
-default-zoom-level = 'small'
