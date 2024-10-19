@@ -53,7 +53,7 @@ class Atui(App):
         except subprocess.CalledProcessError as e:
             if e.stdout != "":
                 self.rlog(e.stdout)
-            elif e.stderr != "":
+            if e.stderr != "":
                 self.rlog(e.stderr)
             else:
                 self.rlog(e)
