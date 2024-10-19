@@ -35,7 +35,7 @@ class Atui(App):
     def rlog(self, to_print: str) -> None:
         self.query_one(RichLog).write(to_print)
 
-    def get_current_value(self, command: str) -> str:
+    def run_gsettings_command(self, command: str) -> str:
         try:
             result = subprocess.run(
                 command,
@@ -66,7 +66,7 @@ class Atui(App):
             for schema_key, des_val in schema_key.items():
                 gsettings_cmd = f"gsettings get {schema} {schema_key}"
                 # cur_val means current (active) value
-                cur_val = self.get_current_value(gsettings_cmd)
+                cur_val = self.run_gsettings_command(gsettings_cmd)
                 # 'gsettings get' sometimes returns types, sometimes not.
                 # So, remove types from the output to compare values.
                 # to check if ok for 'gsettings set' command and all cases
