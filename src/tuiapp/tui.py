@@ -18,6 +18,10 @@ class Sidebar(Vertical):
             label="Compare Settings",
             id="compare_settings",
         )
+        yield Button(
+            label="Update Settings",
+            id="update_settings",
+        )
         yield Button(label="Clear RichLog", id="clear_richlog")
 
 
@@ -108,6 +112,10 @@ class Atui(App):
     @on(Button.Pressed, "#compare_settings")
     def compare_settings_button(self):
         self.compare_settings()
+
+    @on(Button.Pressed, "#update_settings")
+    def update_settings_button(self):
+        pass
 
     @on(Button.Pressed, "#clear_richlog")
     def clear_richlog(self):
