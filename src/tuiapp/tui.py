@@ -49,10 +49,12 @@ class Atui(App):
                 shell=True,
                 timeout=1,
             )
-            if result.returncode == 0 and result.stdout != "":
-                cur_val = result.stdout.strip("'\n ")
-                # return str(result.stdout).strip(" \t\n")
-                return cur_val
+            if result.returncode == 0:
+                if "gsettings get" in command:
+                    return result.stdout
+                if "gsettings set" in command:
+                    # gsettings set returns nothing on success
+                    return "success"
             return "error"
         except subprocess.CalledProcessError as e:
             if e.stdout != "":
