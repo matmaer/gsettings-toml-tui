@@ -35,6 +35,8 @@ class Atui(App):
     def __init__(self):
         super().__init__()
         self.desired = get_toml()
+        # list of dicts with schema, key, old value and new value
+        self.updates = []
 
     def rlog(self, to_print: str) -> None:
         self.query_one(RichLog).write(to_print)
@@ -65,11 +67,6 @@ class Atui(App):
                 self.rlog(e)
             return "error"
 
-    def update_setting(self, schema: str, schema_key: str, value: str) -> None:
-        gsettings_cmd = f"gsettings set {schema} {schema_key} {value}"
-        result = self.run_gsettings_command(gsettings_cmd)
-        return result
-
     def get_current_value(self, schema: str, schema_key: str) -> str:
         gsettings_cmd = f"gsettings get {schema} {schema_key}"
         current_value = self.run_gsettings_command(gsettings_cmd)
@@ -83,23 +80,61 @@ class Atui(App):
             current_value = current_value.replace(text, "")
         return current_value
 
-    def compare_settings(self) -> None:
-        for schema, schema_key in self.desired.items():
-            self.rlog(f"[yellow]{schema}[/]")
-            for schema_key, des_val in schema_key.items():
-                cur_val = self.get_current_value(schema, schema_key)
-                if cur_val == "error":
-                    self.rlog(f"Error getting {schema} {schema_key} value, skipping")
+    def update_settings(self) -> None:
+        self.rlog("[cyan underline]Settings Update[/]")
+        # self.rlog("No changes to update, run 'Compare Settings' first")
+        if len(self.updates) == 0:
+            self.rlog("Nothing to do, run 'Compare Settings' first")
+        else:
+            for update in self.updates:
+                schema = update["schema"]
+                key = update["key"]
+                old_value = update["old_value"]
+                new_value = update["new_value"]
+                command = f"gsettings set {schema} {key} {new_value}"
+                result = self.run_gsettings_command(command)
+                if result == "success":
+                    self.rlog(f"Successfully ran: {command}, old value was {old_value}")
+                    to_print = [
+                        f"[yellow]{schema}[/]",
+                        f"  [green]{key}[/]",
+                        f"    old value: {old_value}",
+                        f"    [bold]new value: {new_value}[/]",
+                    ]
+                    self.rlog("\n".join(to_print))
                 else:
-                    if str(des_val) == str(cur_val):
-                        self.rlog(f"{schema_key} already has value {des_val}, skipping")
-                    else:
+                    self.rlog(f"Error running '{command}'")
+            self.updates = []
+
+    def compare_settings(self) -> list:
+        self.rlog("[cyan underline]Settings Comparison[/]")
+        for schema, keys in self.desired.items():
+            changes_needed_for_schema = False
+            self.rlog(f"[yellow]{schema}[/]")
+            for key, des_val in keys.items():
+                cur_val = self.get_current_value(schema, key)
+                if cur_val == "error":
+                    self.rlog(f"Error getting {schema} {key} value, skipping")
+                else:
+                    if str(des_val) != str(cur_val):
+                        # self.rlog(f"[yellow]{schema}[/]")
                         to_print = [
-                            f"[red]{schema_key} is different[/]",
-                            f"current: {cur_val}",
-                            f"desired: {des_val}",
+                            f"  [red]{key}[/]",
+                            f"    current: {cur_val}",
+                            f"    [bold]desired: {des_val}[/]",
                         ]
                         self.rlog("\n".join(to_print))
+                        self.updates += [
+                            {
+                                "schema": schema,
+                                "key": key,
+                                "old_value": cur_val,
+                                "new_value": des_val,
+                            }
+                        ]
+                        changes_needed_for_schema = True
+            if not changes_needed_for_schema:
+                self.rlog("[green]  No changes needed[/]")
 
     def compose(self) -> ComposeResult:
         with Horizontal():
@@ -124,7 +159,7 @@ class Atui(App):
 
     @on(Button.Pressed, "#update_settings")
     def update_settings_button(self):
-        pass
+        self.update_settings()
 
     @on(Button.Pressed, "#clear_richlog")
     def clear_richlog(self):
