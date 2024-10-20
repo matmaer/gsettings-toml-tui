@@ -63,34 +63,36 @@ class Atui(App):
                 self.rlog(e)
             return "error"
 
+    def get_current_value(self, schema: str, schema_key: str) -> str:
+        gsettings_cmd = f"gsettings get {schema} {schema_key}"
+        current_value = self.run_gsettings_command(gsettings_cmd)
+        # trim from both ends: single quotes, newlines and spaces
+        current_value = current_value.strip("'\n ")
+        # 'gsettings get' sometimes returns types, sometimes not.
+        # So, remove types from the output to compare values.
+        # to check if ok for 'gsettings set' command and all cases
+        to_remove = ["uint32 ", "uint64 ", "int32 ", "int64 "]
+        for text in to_remove:
+            current_value = current_value.replace(text, "")
+        return current_value
+
     def compare_settings(self) -> None:
         for schema, schema_key in self.desired.items():
             self.rlog(f"[yellow]{schema}[/]")
-            # des_val is short for "desired value"
             for schema_key, des_val in schema_key.items():
-                gsettings_cmd = f"gsettings get {schema} {schema_key}"
-                # cur_val means current (active) value
-                cur_val = self.run_gsettings_command(gsettings_cmd)
-                # 'gsettings get' sometimes returns types, sometimes not.
-                # So, remove types from the output to compare values.
-                # to check if ok for 'gsettings set' command and all cases
-                to_remove = ["uint32 ", "uint64 ", "int32 ", "int64 "]
-                for text in to_remove:
-                    cur_val = cur_val.replace(text, "")
-                if cur_val != "error":
-                    # self.rlog(f"{schema_key}: {cur_val}  {des_val}")
-                    if str(des_val) != str(cur_val):
+                cur_val = self.get_current_value(schema, schema_key)
+                if cur_val == "error":
+                    self.rlog(f"Error getting {schema} {schema_key} value, skipping")
+                else:
+                    if str(des_val) == str(cur_val):
+                        self.rlog(f"{schema_key} already has value {des_val}, skipping")
+                    else:
                         to_print = [
                             f"[red]{schema_key} is different[/]",
                             f"current: {cur_val}",
                             f"desired: {des_val}",
                         ]
                         self.rlog("\n".join(to_print))
-                    else:
-                        self.rlog(f"{schema_key} already has value {des_val}")
-                else:
-                    self.rlog(f"Error retrieving value for {schema_key}, aborting")
-                    break
 
     def compose(self) -> ComposeResult:
         with Horizontal():
