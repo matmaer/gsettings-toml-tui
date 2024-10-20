@@ -84,7 +84,7 @@ class Atui(App):
         self.rlog("[cyan underline]Settings Update[/]")
         # self.rlog("No changes to update, run 'Compare Settings' first")
         if len(self.updates) == 0:
-            self.rlog("Nothing to do, run 'Compare Settings' first")
+            self.rlog("Nothing to do, run 'Compare Settings' to check.")
         else:
             for update in self.updates:
                 schema = update["schema"]
@@ -94,23 +94,22 @@ class Atui(App):
                 command = f"gsettings set {schema} {key} {new_value}"
                 result = self.run_gsettings_command(command)
                 if result == "success":
-                    self.rlog(f"Successfully ran: {command}, old value was {old_value}")
                     to_print = [
-                        f"[yellow]{schema}[/]",
-                        f"  [green]{key}[/]",
-                        f"    old value: {old_value}",
-                        f"    [bold]new value: {new_value}[/]",
+                        f"  [yellow]{schema}[/] [green bold]UPDATED[/]",
+                        f"    [green]{key}[/]",
+                        f"      [bold]new value: {new_value}[/] (old value: {old_value})",
                     ]
                     self.rlog("\n".join(to_print))
                 else:
                     self.rlog(f"Error running '{command}'")
             self.updates = []
+        self.rlog("")
 
     def compare_settings(self) -> list:
         self.rlog("[cyan underline]Settings Comparison[/]")
         for schema, keys in self.desired.items():
             changes_needed_for_schema = False
-            self.rlog(f"[yellow]{schema}[/]")
+            # self.rlog(f"[yellow]{schema}[/]")
             for key, des_val in keys.items():
                 cur_val = self.get_current_value(schema, key)
                 if cur_val == "error":
@@ -119,8 +118,8 @@ class Atui(App):
                     if str(des_val) != str(cur_val):
                         # self.rlog(f"[yellow]{schema}[/]")
                         to_print = [
-                            f"  [red]{key}[/]",
-                            f"    current: {cur_val}",
+                            f"[yellow]{schema}[/][red] TO UPDATE[/]",
+                            f"  [green]{key}[/] {cur_val}",
                             f"    [bold]desired: {des_val}[/]",
                         ]
                         self.rlog("\n".join(to_print))
@@ -134,7 +133,8 @@ class Atui(App):
                         ]
                         changes_needed_for_schema = True
             if not changes_needed_for_schema:
-                self.rlog("[green]  No changes needed[/]")
+                self.rlog(f"[yellow]{schema}[/]: [green]no changes needed[/]")
+        self.rlog("")
 
     def compose(self) -> ComposeResult:
         with Horizontal():
@@ -151,7 +151,9 @@ class Atui(App):
 
     @on(Button.Pressed, "#show_toml")
     def show_toml_settings(self):
+        self.rlog("[cyan underline]Desired Settings[/]")
         self.rlog(self.desired)
+        self.rlog("")
 
     @on(Button.Pressed, "#compare_settings")
     def compare_settings_button(self):
