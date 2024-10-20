@@ -1,7 +1,6 @@
 import tomllib
 from pathlib import Path
 
-
 CONFIGS_DIR = Path(__file__).resolve().parent / "configs"
 
 TUI_TCSS = CONFIGS_DIR / "tui.tcss"
