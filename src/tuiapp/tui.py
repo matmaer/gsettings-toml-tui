@@ -91,13 +91,12 @@ class Atui(App):
                 key = update["key"]
                 old_value = update["old_value"]
                 new_value = update["new_value"]
-                command = f"gsettings set {schema} {key} {new_value}"
+                command = f'gsettings set {schema} {key} "{new_value}"'
                 result = self.run_gsettings_command(command)
                 if result == "success":
                     to_print = [
                         f"  [yellow]{schema}[/] [green bold]UPDATED[/]",
-                        f"    [green]{key}[/]",
-                        f"      [bold]new value: {new_value}[/] (old value: {old_value})",
+                        f"    [green]{key}: [/]{new_value} (old value: {old_value})",
                     ]
                     self.rlog("\n".join(to_print))
                 else:
@@ -116,10 +115,9 @@ class Atui(App):
                     self.rlog(f"Error getting {schema} {key} value, skipping")
                 else:
                     if str(des_val) != str(cur_val):
-                        # self.rlog(f"[yellow]{schema}[/]")
                         to_print = [
                             f"[yellow]{schema}[/][red] TO UPDATE[/]",
-                            f"  [green]{key}[/] {cur_val}",
+                            f"  [green]{key}:[/] {cur_val}",
                             f"    [bold]desired: {des_val}[/]",
                         ]
                         self.rlog("\n".join(to_print))
