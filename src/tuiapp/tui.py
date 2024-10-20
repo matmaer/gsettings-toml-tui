@@ -65,6 +65,11 @@ class Atui(App):
                 self.rlog(e)
             return "error"
 
+    def update_setting(self, schema: str, schema_key: str, value: str) -> None:
+        gsettings_cmd = f"gsettings set {schema} {schema_key} {value}"
+        result = self.run_gsettings_command(gsettings_cmd)
+        return result
+
     def get_current_value(self, schema: str, schema_key: str) -> str:
         gsettings_cmd = f"gsettings get {schema} {schema_key}"
         current_value = self.run_gsettings_command(gsettings_cmd)
