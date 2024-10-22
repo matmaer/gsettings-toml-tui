@@ -3,7 +3,7 @@ import subprocess
 from textual import on
 from textual.app import App, ComposeResult
 from textual.containers import Horizontal, Vertical
-from textual.widgets import Button, Footer, RichLog
+from textual.widgets import Button, Footer, Header, RichLog
 
 from .config import TUI_TCSS, get_toml
 
@@ -11,21 +11,29 @@ from .config import TUI_TCSS, get_toml
 class Sidebar(Vertical):
     def compose(self) -> ComposeResult:
         yield Button(
-            label="Desired Settings",
-            id="show_toml",
+            label="Generate",
+            id="gen_toml",
+            tooltip="Generate toml file with current settings",
         )
         yield Button(
-            label="Compare Settings",
+            label="Customize",
+            id="custom_toml",
+            tooltip="create or show customized settings toml file",
+        )
+        yield Button(
+            label="Compare",
             id="compare_settings",
+            tooltip="Compare current settings with custom settings",
         )
         yield Button(
-            label="Update Settings",
+            label="Update",
             id="update_settings",
+            tooltip="Update settings with 'gsettings set' to match the custom toml file",
         )
-        yield Button(label="Clear RichLog", id="clear_richlog")
+        yield Button(label="Clear \nRichLog", id="clear_richlog")
 
 
-class Atui(App):
+class GSettings(App):
     BINDINGS = [
         ("s", "toggle_sidebar", "Toggle Maximized"),
         ("q", "quit", "Quit"),
@@ -135,6 +143,7 @@ class Atui(App):
         self.rlog("")
 
     def compose(self) -> ComposeResult:
+        yield Header()
         with Horizontal():
             yield Sidebar(id="sidebar")
             yield RichLog(
@@ -147,8 +156,13 @@ class Atui(App):
     def action_toggle_sidebar(self):
         self.query_one(Sidebar).toggle_class("-hidden")
 
-    @on(Button.Pressed, "#show_toml")
+    @on(Button.Pressed, "#gen_toml")
     def show_toml_settings(self):
+        self.rlog("[cyan underline]Generate Toml file from current settings (to do)[/]")
+        self.rlog("")
+
+    @on(Button.Pressed, "#custom_toml")
+    def generate_toml_button(self):
         self.rlog("[cyan underline]Desired Settings[/]")
         self.rlog(self.desired)
         self.rlog("")
@@ -167,5 +181,5 @@ class Atui(App):
 
 
 def run_tui():
-    app = Atui()
+    app = GSettings()
     app.run()
