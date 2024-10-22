@@ -60,11 +60,10 @@ class GSettings(App):
                 timeout=1,
             )
             if result.returncode == 0:
-                if "gsettings get" in command:
-                    return result.stdout
-                if "gsettings set" in command:
+                if "gsettings set" in command and result.stdout == "":
                     # gsettings set returns nothing on success
                     return "success"
+                return result.stdout
             return "error"
         except subprocess.CalledProcessError as e:
             if e.stdout != "":
@@ -74,6 +73,10 @@ class GSettings(App):
             else:
                 self.rlog(e)
             return "error"
+
+    def create_current_settings_toml(self) -> None:
+        schemas = self.run_gsettings_command("gsettings list-schemas")
+        return schemas
 
     def get_current_value(self, schema: str, schema_key: str) -> str:
         gsettings_cmd = f"gsettings get {schema} {schema_key}"
@@ -157,12 +160,12 @@ class GSettings(App):
         self.query_one(Sidebar).toggle_class("-hidden")
 
     @on(Button.Pressed, "#gen_toml")
-    def show_toml_settings(self):
-        self.rlog("[cyan underline]Generate Toml file from current settings (to do)[/]")
+    def generate_toml_settings(self):
+        self.rlog("[cyan underline]Generate Toml file: to do[/]")
         self.rlog("")
 
     @on(Button.Pressed, "#custom_toml")
-    def generate_toml_button(self):
+    def show_toml_button(self):
         self.rlog("[cyan underline]Desired Settings[/]")
         self.rlog(self.desired)
         self.rlog("")
