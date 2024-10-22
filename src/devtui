@@ -1,5 +1,0 @@
-#!/home/mm/.venv/dev/bin/python
-from tuiapp import tui
-
-if __name__ == "__main__":
-    tui.run_tui()
