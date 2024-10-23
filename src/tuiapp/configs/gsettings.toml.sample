@@ -1,0 +1,15 @@
+["org.gnome.desktop.interface"]
+clock-format = '24h'
+clock-show-seconds = 'true'
+clock-show-weekday = 'true'
+gtk-timeout-repeat = 30
+
+["org.gnome.desktop.media-handling"]
+automount = 'false'
+automount-open = 'false'
+autorun-never = 'true'
+
+["org.gnome.desktop.wm.preferences"]
+audible-bell = 'false'
+button-layout = 'appmenu:minimize,close'
+num-workspaces = 3
