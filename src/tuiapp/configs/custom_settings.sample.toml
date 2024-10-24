@@ -1,3 +1,7 @@
+# this is a sample config file for the custom settings
+# it's an example that will also be used in case there is no
+# custom settings file in the app, as an option to demonstrate or test
+# the app's ability to load and change the current settings
 ["org.gnome.desktop.interface"]
 clock-format = '24h'
 clock-show-seconds = 'true'
