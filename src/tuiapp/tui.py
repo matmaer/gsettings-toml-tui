@@ -60,11 +60,17 @@ class GSettings(App):
                 timeout=1,
             )
             if result.returncode == 0:
-                if "gsettings set" in command and result.stdout == "":
+                if result.stdout == "":
                     # gsettings set returns nothing on success
-                    return "success"
-                return result.stdout
-            return "error"
+                    if "gsettings set" in command:
+                        return "success"
+                    if "gsettings list-schemas" in command:
+                        return result.stdout
+                    if "gsettings list-keys" in command:
+                        return ["no_keys"]
+            else:
+                return "no_stdout"
+            return result.stderr
         except subprocess.CalledProcessError as e:
             if e.stdout != "":
                 self.rlog(e.stdout)
