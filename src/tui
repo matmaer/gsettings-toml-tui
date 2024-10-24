@@ -1,5 +1,19 @@
 #!/usr/bin/env python3
+import os
+
 from tuiapp import tui
+
+# basic pre-flight checks
+assert (
+    os.name == "posix"
+), "This app is only useful to run on a Linux operating system with a Gnome desktop environment."
+# Shell has to be bash (more support will be added later)
+assert "bash" in os.environ["SHELL"], "Currently only bash shell is tested/supported."
+# app currently depends on locally installed gsettings command
+assert (
+    os.system("which gsettings") == 0
+), "The app depends on the gsettings command being available in the shell."
+
 
 if __name__ == "__main__":
     tui.run_tui()
