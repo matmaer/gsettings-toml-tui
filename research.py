@@ -3,11 +3,9 @@ def generate_cicd_stars_chart():
         "hatch": "https://github.com/pypa/hatch",
         "pdm": "https://github.com/pdm-project/pdm",
         "poetry": "https://github.com/python-poetry/poetry",
-        "pyenv": "https://github.com/pyenv/pyenv",
         "pyflow": "https://github.com/wonderworks-software/PyFlow",
         "rye": "https://github.com/astral-sh/rye",
         "uv": "https://github.com/astral-sh/uv",
-        "virtualenv": "https://github.com/pypa/virtualenv",
     }
 
     star_count_params = []
