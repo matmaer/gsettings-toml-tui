@@ -1,4 +1,4 @@
-def generate_cicd_stars_chart():
+def generate_cd_stars_chart():
     tools = {
         "hatch": "https://github.com/pypa/hatch",
         "pdm": "https://github.com/pdm-project/pdm",
