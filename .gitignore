@@ -1,2 +1,3 @@
 __pycache__
 notes/*
+src/tuiapp/configs/all_settings.pickle
