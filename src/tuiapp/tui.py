@@ -139,7 +139,6 @@ class GSettings(App):
                 "flags": "type: lags;",
                 "range d": "type; range of double precision floating point;",
                 "range i": "type: range of integers;",
-                "range": "type: range;",
                 "type ai": "type: array of integers;",
                 "type as": "type: array of strings;",
                 "type av": "type: array of variants;",
