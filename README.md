@@ -1,6 +1,10 @@
 # gsettings-toml-tui
 
-Terminal app with modern terminal user interface, to set a batch of [Gnome](https://www.gnome.org/) user settings in the dconf database. The desired settings are kept in a toml file which contains the setting-schemas with keys and values. Gnome is [available](https://www.gnome.org/getting-gnome/) for most major Linux distributions.
+Terminal app with modern terminal user interface, to set a batch of [Gnome](https://www.gnome.org/) user settings in the dconf database. 
+
+The desired settings are created after editing the generated config file for all settings. Both contain the setting-schemas with keys and values. Values types and ranges are visualized.
+
+Gnome is [available](https://www.gnome.org/getting-gnome/) for most major Linux distributions.
 
 Changing these settings is normally done in the Gnome GUI by the user.  On some occasions, for example to configure a newly created user or to verify your current settings against the toml file; you could save some time as opposed to doing this "manually" in the Gnome GUI.
 
