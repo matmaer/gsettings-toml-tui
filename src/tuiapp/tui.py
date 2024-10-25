@@ -41,7 +41,6 @@ class Sidebar(Vertical):
 class GSettings(App):
     def __init__(self):
         super().__init__()
-        # self.custom_settings_file = CONFIGS / "custom_settings.toml"
         self.all_settings_pickle = CONFIGS / "all_settings.pickle"
         if self.all_settings_pickle.exists():
             with open(self.all_settings_pickle, "rb") as pickle_file:
@@ -68,7 +67,6 @@ class GSettings(App):
             result = subprocess.run(
                 command,
                 capture_output=True,
-                # check=True will raise an exception if return code is not 0
                 check=True,
                 encoding="utf-8",
                 timeout=1,
@@ -100,24 +98,25 @@ class GSettings(App):
 
     def list_keys(self, schema: str) -> list:
         result = self.run_command(["gsettings", "list-keys", schema])
-        if result.stdout in ["error", ""]:
+        if result.stdout in ["error", "", [], None]:
             return []
         all_keys = result.stdout.split("\n")
-        keys = all_keys.copy()
+        to_exclude = [
+            "window-width",
+            "window-maximized",
+            "window-height",
+            "window-fullscreen",
+            "recent-",
+            "selected-",
+            "recently-",
+            "recent-",
+            "last-",
+        ]
+        to_return = []
         for key in all_keys:
-            to_exclude = [
-                # "window-",
-                "recent-",
-                "selected-",
-                "recently-",
-                "recent-",
-                "last-",
-            ]
-            for pattern in to_exclude:
-                if pattern in key:
-                    keys.remove(key)
-                    break
-        return keys
+            if not any(exclude in key for exclude in to_exclude):
+                to_return.append(key)
+        return to_return
 
     def get_value(self, schema: str, key: str) -> str:
         result = self.run_command(["gsettings", "get", schema, key])
@@ -136,21 +135,21 @@ class GSettings(App):
                 type_range_str = result.stdout
             # make the type more readable
             types_replacements = {
-                "enum ": "type: enumeration; ",
-                "flags ": "type: lags; ",
-                "range d ": "type; range of double precision floating point; ",
-                "range i ": "type: range of integers; ",
-                "range ": "type: range; ",
-                "type a ": "type: array; ",
-                "type ai ": "type: array of integers; ",
-                "type as ": "type: array of strings; ",
-                "type b ": "type: boolean; ",
-                "type d ": "type: double precision floating point; ",
-                "type i ": "type: integer; ",
-                "type s ": "type: string",
-                "type t ": "type: t; ",
-                "type u ": "type: unsigned integer; ",
-                "type av ": "type: array of variants; ",
+                "enum": "type: enumeration;",
+                "flags": "type: lags;",
+                "range d": "type; range of double precision floating point;",
+                "range i": "type: range of integers;",
+                "range": "type: range;",
+                "type ai": "type: array of integers;",
+                "type as": "type: array of strings;",
+                "type av": "type: array of variants;",
+                "type a": "type: array;",
+                "type b": "type: boolean;",
+                "type d": "type: double precision floating point;",
+                "type i": "type: integer;",
+                "type s": "type: string",
+                "type t": "type: t;",
+                "type u": "type: unsigned integer;",
             }
             # construct the range and type string
             for current, new in types_replacements.items():
@@ -166,7 +165,8 @@ class GSettings(App):
         schemas = self.list_schemas()
         for schema in schemas:
             keys = self.list_keys(schema)
-            if keys == [] or keys == "" or keys == "error":
+            # jump to next schema
+            if keys in [[], "", "error", None]:
                 continue
             settings_dict[schema] = {}
             for key in keys:
@@ -179,8 +179,8 @@ class GSettings(App):
                     "type_range": str(type_range_str),
                 }
                 settings_dict[schema][key] = values_dict
-        with open(self.all_settings_pickle, "wb") as f:
-            pickle.dump(settings_dict, f)
+        # with open(self.all_settings_pickle, "wb") as f:
+        #     pickle.dump(settings_dict, f)
         return settings_dict
 
     def write_all_settings(self) -> None:
