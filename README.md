@@ -6,7 +6,7 @@ The desired settings are created after editing the generated config file for all
 
 Gnome is [available](https://www.gnome.org/getting-gnome/) for most major Linux distributions.
 
-Changing these settings is normally done in the Gnome GUI by the user.  On some occasions, for example to configure a newly created user or to verify your current settings against the toml file; you could save some time as opposed to doing this "manually" in the Gnome GUI.
+Changing these settings is normally done in the Gnome GUI by the user.  On some occasions, for example to configure a newly created user or to verify your current settings against your custom config; you could save some time as opposed to doing this "manually" in the Gnome GUI.
 
 Build with [Textual](https://github.com/Textualize/textual), which is part of probably the best Rapid Application Development framework for Python at present time. It's lean, stable and user friendly, at least from my experience. See also [textual.textualize.io](https://textual.textualize.io/).
 
