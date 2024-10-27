@@ -67,13 +67,17 @@ class GSettings(App):
             result = subprocess.run(
                 command,
                 capture_output=True,
+                # raise subprocess exception for any non-zero return code
+                # in the shell where the command runs
                 check=True,
                 encoding="utf-8",
+                # set expliceitly shell=False to avoid shell injection
+                shell=False,
+                # minimal timeout, as the commands are expected to run fast
                 timeout=1,
             )
-            # always remove leading and trailing spaces, tabs and newlines
-            # \' will make sure the result is not returned with both single
-            # and double quotes
+            # always remove leading and trailing spaces, tabs and newlines,
+            # double quotes to avoid both single and double quotes in output
             result.stdout = result.stdout.strip('\t\n" ')
             return result
         except subprocess.CalledProcessError as e:
