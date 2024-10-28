@@ -1,4 +1,4 @@
-from gsettings_app.tui import GSettings
+from gsettings_toml.tui import GSettings
 
 
 def main() -> None:
