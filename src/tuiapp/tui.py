@@ -2,13 +2,11 @@ import pickle
 import subprocess
 from pathlib import Path
 
+from gi.repository import Gio
 from textual import on
 from textual.app import App, ComposeResult
 from textual.containers import Horizontal, Vertical
 from textual.widgets import Button, Footer, Header, RichLog
-
-# import tomllib
-
 
 CONFIGS = Path(__file__).resolve().parent / "configs"
 TCSS_PATH = CONFIGS / "tui.tcss"
@@ -78,33 +76,22 @@ class GSettings(App):
             )
             # always remove leading and trailing spaces, tabs and newlines,
             # double quotes to avoid both single and double quotes in output
-            result.stdout = result.stdout.strip('\t\n" ')
-            return result
+            return result.stdout.strip('\t\n" ')
         except subprocess.CalledProcessError as e:
-            message = f"'{e.cmd}' failed, exit conde {e.returncode}"
+            message = f"{e.cmd} failed, exit conde {e.returncode}"
             self.rlog(f"[tomato bold]{message}[/]")
             self.rlog(f"[lightpink bold]'{e.stdout}'[/]")
             return "error"
 
     def list_schemas(self) -> list:
-        result = self.run_command(["gsettings", "list-schemas"])
-        if result.stdout != "" and result != "error":
-            schemas = result.stdout.split("\n")
-            for schema in schemas:
-                command = ["gsettings", "list-children", schema]
-                children = self.run_command(command)
-                if children != "":
-                    # the schema has children, no keys for settings
-                    schemas.remove(schema)
-            return schemas
-        # return empty list if no schemas can be retrieved
-        return []
+        schemas = Gio.Settings.list_schemas()
+        return schemas
 
     def list_keys(self, schema: str) -> list:
         result = self.run_command(["gsettings", "list-keys", schema])
-        if result.stdout in ["error", "", [], None]:
+        if result in ["error", "", [], None]:
             return []
-        all_keys = result.stdout.split("\n")
+        all_keys = result.split("\n")
         to_exclude = [
             "window-width",
             "window-maximized",
@@ -125,34 +112,33 @@ class GSettings(App):
     def get_value(self, schema: str, key: str) -> str:
         result = self.run_command(["gsettings", "get", schema, key])
         if result != "error":
-            return result.stdout
+            return result
         # return empty string if no value can be retrieved
         return ""
 
     def get_type_and_range(self, schema: str, key: str) -> str:
         result = self.run_command(["gsettings", "range", schema, key])
-        if result.stdout != "error" and result.stdout != "":
-            # if ["error", ""] in result.stdout:
-            if "\n" in result.stdout:
-                type_range_str = result.stdout.replace("\n", ", ")
+        if result not in [None, "error", ""]:
+            if "\n" in result:
+                type_range_str = result.strip().replace("\n", ", ")
             else:
-                type_range_str = result.stdout
+                type_range_str = result
             # make the type more readable
             types_replacements = {
-                "enum": "type: enumeration;",
-                "flags": "type: lags;",
-                "range d": "type; range of double precision floating point;",
-                "range i": "type: range of integers;",
-                "type ai": "type: array of integers;",
-                "type as": "type: array of strings;",
-                "type av": "type: array of variants;",
-                "type a": "type: array;",
-                "type b": "type: boolean;",
-                "type d": "type: double precision floating point;",
-                "type i": "type: integer;",
+                "enum": "type: enumeration",
+                "flags": "type: lags",
+                "range d": "type range of double precision floating point",
+                "range i": "type: range of integers",
+                "type ai": "type: array of integers",
+                "type as": "type: array of strings",
+                "type av": "type: array of variants",
+                "type a": "type: array",
+                "type b": "type: boolean",
+                "type d": "type: double precision floating point",
+                "type i": "type: integer",
                 "type s": "type: string",
-                "type t": "type: t;",
-                "type u": "type: unsigned integer;",
+                "type t": "type: t",
+                "type u": "type: unsigned integer",
             }
             # construct the range and type string
             for current, new in types_replacements.items():
@@ -166,6 +152,12 @@ class GSettings(App):
         # create nested dict with all settings
         settings_dict = {}
         schemas = self.list_schemas()
+        # schemas = Gio.Settings.list_schemas()
+        # schemas = [
+        #     "org.gnome.Console",
+        #     "org.gnome.TextEditor",
+        # ]
+        # # return schemas
         for schema in schemas:
             keys = self.list_keys(schema)
             # jump to next schema
